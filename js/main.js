@@ -1,5 +1,5 @@
-import { SUBREDDITS, SUBREDDIT_LABELS, fetchAllSubreddits, formatScore } from './reddit.js';
-import { fetchKoreanPosts } from './korean.js';
+import { SUBREDDITS, SUBREDDIT_LABELS, fetchAllSubreddits, formatScore } from './reddit.js?v=2';
+import { fetchKoreanPosts } from './korean.js?v=2';
 
 /* ── State ─────────────────────────────────────────────────────────────── */
 let lang        = 'en';
