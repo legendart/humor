@@ -1,76 +1,28 @@
-import { SUBREDDITS, SUBREDDIT_LABELS, fetchAllSubreddits, formatScore } from './reddit.js?v=2';
+import { SUBREDDITS, fetchAllSubreddits, formatScore } from './reddit.js?v=2';
 import { fetchKoreanPosts } from './korean.js?v=2';
 
 /* ── State ─────────────────────────────────────────────────────────────── */
-let lang        = 'en';
-let activeSubs  = [...SUBREDDITS];
-let allPosts    = [];
-let displayed   = 0;
+let lang      = 'en';
+let allPosts  = [];
+let displayed = 0;
 const PAGE_SIZE = 30;
 
 /* ── DOM refs ───────────────────────────────────────────────────────────── */
-const gridEl        = document.getElementById('grid');
-const statusDot     = document.getElementById('statusDot');
-const statusText    = document.getElementById('statusText');
-const filtersWrap   = document.getElementById('filtersWrap');
-const sortSelect    = document.getElementById('sortSelect');
-const loadMoreWrap  = document.getElementById('loadMoreWrap');
-const loadMoreBtn   = document.getElementById('loadMoreBtn');
+const gridEl       = document.getElementById('grid');
+const statusDot    = document.getElementById('statusDot');
+const statusText   = document.getElementById('statusText');
+const sortSelect   = document.getElementById('sortSelect');
+const loadMoreWrap = document.getElementById('loadMoreWrap');
+const loadMoreBtn  = document.getElementById('loadMoreBtn');
 
 /* ── Lang toggle ────────────────────────────────────────────────────────── */
 document.querySelectorAll('.lang-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     lang = btn.dataset.lang;
     document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
-    renderFilters();
     loadPosts();
   });
 });
-
-/* ── Subreddit filters ──────────────────────────────────────────────────── */
-function renderFilters() {
-  filtersWrap.innerHTML = '';
-  if (lang !== 'en') return;
-
-  const allBtn = makeFilterBtn('All', null);
-  filtersWrap.appendChild(allBtn);
-
-  SUBREDDITS.forEach(sub => {
-    filtersWrap.appendChild(makeFilterBtn(SUBREDDIT_LABELS[sub], sub));
-  });
-  updateFilterActive();
-}
-
-function makeFilterBtn(label, sub) {
-  const btn = document.createElement('button');
-  btn.className = 'filter-btn';
-  btn.textContent = label;
-  btn.dataset.sub = sub ?? '';
-  btn.addEventListener('click', () => {
-    if (!sub) {
-      activeSubs = [...SUBREDDITS];
-    } else {
-      activeSubs = activeSubs.includes(sub)
-        ? activeSubs.filter(s => s !== sub)
-        : [...activeSubs, sub];
-      if (activeSubs.length === 0) activeSubs = [...SUBREDDITS];
-    }
-    updateFilterActive();
-    sortAndRender();
-  });
-  return btn;
-}
-
-function updateFilterActive() {
-  filtersWrap.querySelectorAll('.filter-btn').forEach(btn => {
-    const sub = btn.dataset.sub;
-    if (!sub) {
-      btn.classList.toggle('active', activeSubs.length === SUBREDDITS.length);
-    } else {
-      btn.classList.toggle('active', activeSubs.includes(sub));
-    }
-  });
-}
 
 /* ── Sort ────────────────────────────────────────────────────────────────── */
 sortSelect.addEventListener('change', sortAndRender);
@@ -78,8 +30,8 @@ sortSelect.addEventListener('change', sortAndRender);
 function sortPosts(posts) {
   const v = sortSelect.value;
   const arr = [...posts];
-  if (v === 'hot')  return arr.sort((a, b) => b.score - a.score);
-  if (v === 'new')  return arr.sort((a, b) => {
+  if (v === 'hot')   return arr.sort((a, b) => b.score - a.score);
+  if (v === 'new')   return arr.sort((a, b) => {
     const at = a.createdAt || a.createdUtc * 1000 || 0;
     const bt = b.createdAt || b.createdUtc * 1000 || 0;
     return bt - at;
@@ -92,16 +44,16 @@ function sortPosts(posts) {
 async function loadPosts() {
   setStatus('loading', lang === 'en' ? 'Reddit에서 불러오는 중...' : '한국 커뮤니티 데이터 로드 중...');
   showSkeletons();
-  allPosts = [];
+  allPosts  = [];
   displayed = 0;
 
   try {
-    if (lang === 'en') {
-      allPosts = await fetchAllSubreddits(activeSubs, 'hot');
-    } else {
-      allPosts = await fetchKoreanPosts();
-    }
+    allPosts = lang === 'en'
+      ? await fetchAllSubreddits(SUBREDDITS, 'hot')
+      : await fetchKoreanPosts();
+
     sortAndRender();
+
     if (allPosts.length === 0 && lang === 'ko') {
       setStatus('ok', 'GitHub Actions 데이터 준비 중...');
       showKoEmpty();
@@ -116,12 +68,7 @@ async function loadPosts() {
 }
 
 function sortAndRender() {
-  const sorted = sortPosts(
-    lang === 'en'
-      ? allPosts.filter(p => activeSubs.includes(p.sub))
-      : allPosts
-  );
-  allPosts = sorted;
+  allPosts  = sortPosts(allPosts);
   displayed = 0;
   gridEl.innerHTML = '';
   appendCards(PAGE_SIZE);
@@ -135,8 +82,7 @@ function appendCards(n) {
 }
 
 function updateLoadMore() {
-  const hasMore = displayed < allPosts.length;
-  loadMoreWrap.hidden = !hasMore;
+  loadMoreWrap.hidden = displayed >= allPosts.length;
 }
 
 loadMoreBtn.addEventListener('click', () => {
@@ -244,5 +190,4 @@ function showKoEmpty() {
 }
 
 /* ── Init ─────────────────────────────────────────────────────────────────  */
-renderFilters();
 loadPosts();
