@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JAVIS HUMOR</title>
+  <meta name="description" content="Reddit + 한국 커뮤니티 인기 유머글 모음">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-logo">😂</div>
+      <div>
+        <div class="brand-name">JAVIS HUMOR</div>
+        <div class="brand-sub">Community Laughs</div>
+      </div>
+    </div>
+
+    <div class="header-spacer"></div>
+
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="ko">KO</button>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="subreddit-filters" id="filtersWrap"></div>
+  <select class="sort-select" id="sortSelect">
+    <option value="hot">🔥 인기순</option>
+    <option value="new">🆕 최신순</option>
+    <option value="views">👁 조회순</option>
+  </select>
+</div>
+
+<div class="status-bar">
+  <span class="status-dot loading" id="statusDot"></span>
+  <span id="statusText">불러오는 중...</span>
+</div>
+
+<main class="grid" id="grid"></main>
+
+<div class="load-more-wrap" id="loadMoreWrap" hidden>
+  <button class="load-more-btn" id="loadMoreBtn">더 보기</button>
+</div>
+
+<footer>
+  JAVIS HUMOR &mdash; Reddit &amp; 한국 커뮤니티 인기 유머 aggregator
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+name: Scrape Korean Humor
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml
+
+      - name: Run scraper
+        run: python scripts/scrape.py
+
+      - name: Commit & push
+        run: |
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add data/ko.json
+          git diff --staged --quiet || git commit -m "chore: update ko humor data"
+          git push
