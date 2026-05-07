@@ -102,7 +102,12 @@ async function loadPosts() {
       allPosts = await fetchKoreanPosts();
     }
     sortAndRender();
-    setStatus('ok', `${allPosts.length}개 게시물 로드됨`);
+    if (allPosts.length === 0 && lang === 'ko') {
+      setStatus('ok', 'GitHub Actions 데이터 준비 중...');
+      showKoEmpty();
+    } else {
+      setStatus('ok', `${allPosts.length}개 게시물 로드됨`);
+    }
   } catch (err) {
     console.error(err);
     setStatus('error', '로드 실패 — 새로고침해 주세요');
@@ -226,6 +231,15 @@ function showError() {
       <div class="icon">😵</div>
       <h3>데이터를 불러올 수 없습니다</h3>
       <p>잠시 후 다시 시도해 주세요</p>
+    </div>`;
+}
+
+function showKoEmpty() {
+  gridEl.innerHTML = `
+    <div class="empty-state">
+      <div class="icon">⏳</div>
+      <h3>한국 커뮤니티 데이터 준비 중</h3>
+      <p>GitHub Actions가 2시간마다 데이터를 수집합니다.<br>첫 수집 완료 후 게시물이 표시됩니다.</p>
     </div>`;
 }
 

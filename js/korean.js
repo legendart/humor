@@ -16,22 +16,8 @@ function koTimeAgo(isoStr) {
 }
 
 async function fetchKoreanPosts() {
-  const base = location.pathname.includes('/humor') ? '.' : './humor';
-  const url  = `${location.origin}${location.pathname.replace(/\/[^/]*$/, '')}/data/ko.json`;
-
-  let res;
-  try {
-    res = await fetch('./data/ko.json', { cache: 'no-cache' });
-    if (!res.ok) throw new Error(res.status);
-  } catch {
-    try {
-      res = await fetch('/humor/data/ko.json', { cache: 'no-cache' });
-      if (!res.ok) throw new Error(res.status);
-    } catch {
-      return [];
-    }
-  }
-
+  const res = await fetch('./data/ko.json', { cache: 'no-cache' });
+  if (!res.ok) throw new Error(`ko.json fetch failed: ${res.status}`);
   const raw = await res.json();
   return raw.map(item => ({
     id:        `ko-${item.site}-${item.id || Math.random()}`,

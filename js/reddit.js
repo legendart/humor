@@ -32,11 +32,12 @@ function formatScore(n) {
   return String(n);
 }
 
+const CORS_PROXY = 'https://corsproxy.io/?';
+
 async function fetchSubreddit(sub, sort = 'hot', limit = 25) {
-  const url = `https://www.reddit.com/r/${sub}/${sort}.json?limit=${limit}&raw_json=1`;
-  const res = await fetch(url, {
-    headers: { 'Accept': 'application/json' },
-  });
+  const target = `https://www.reddit.com/r/${sub}/${sort}.json?limit=${limit}&raw_json=1`;
+  const url = CORS_PROXY + encodeURIComponent(target);
+  const res = await fetch(url);
   if (!res.ok) throw new Error(`Reddit ${sub}: ${res.status}`);
   const json = await res.json();
   return json.data.children
