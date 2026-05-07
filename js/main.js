@@ -98,10 +98,8 @@ async function loadPosts() {
   try {
     if (lang === 'en') {
       allPosts = await fetchAllSubreddits(activeSubs, 'hot');
-      console.log('[humor] fetchAllSubreddits returned', allPosts.length, 'posts, activeSubs=', JSON.stringify(activeSubs));
     } else {
       allPosts = await fetchKoreanPosts();
-      console.log('[humor] fetchKoreanPosts returned', allPosts.length, 'posts');
     }
     sortAndRender();
     if (allPosts.length === 0 && lang === 'ko') {
@@ -118,10 +116,11 @@ async function loadPosts() {
 }
 
 function sortAndRender() {
-  const beforeFilter = allPosts.length;
-  const filtered = lang === 'en' ? allPosts.filter(p => activeSubs.includes(p.sub)) : allPosts;
-  console.log('[humor] sortAndRender: before=', beforeFilter, 'after filter=', filtered.length, 'activeSubs=', JSON.stringify(activeSubs));
-  const sorted = sortPosts(filtered);
+  const sorted = sortPosts(
+    lang === 'en'
+      ? allPosts.filter(p => activeSubs.includes(p.sub))
+      : allPosts
+  );
   allPosts = sorted;
   displayed = 0;
   gridEl.innerHTML = '';
