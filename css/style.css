@@ -6,10 +6,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1.5rem;
+  padding: 0 1.5rem;
   background: rgba(10,14,26,0.95);
   backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(255,255,255,0.08);
+  height: 48px;
 }
 .javis-nav__home {
   font-weight: 700;
@@ -18,15 +19,30 @@
   text-decoration: none;
   letter-spacing: 0.05em;
 }
-.javis-nav__links { display: flex; gap: 1.2rem; }
+.javis-nav__links { display: flex; height: 100%; }
 .javis-nav__links a {
-  color: rgba(255,255,255,0.65);
+  color: rgba(255,255,255,0.55);
   text-decoration: none;
-  font-size: 0.85rem;
-  transition: color 0.2s;
+  font-size: 0.82rem;
+  font-weight: 500;
+  padding: 0 0.9rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
 }
 .javis-nav__links a:hover { color: #fff; }
-.javis-nav__links a.active { color: #fff; font-weight: 600; }
+.javis-nav__links a.active {
+  color: #fff;
+  font-weight: 700;
+  border-bottom-color: #7c83fd;
+}
+@media (max-width: 600px) {
+  .javis-nav__links .nav-label { display: none; }
+  .javis-nav__links a { padding: 0 0.65rem; }
+}
 
 /* ── Reset & base ──────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
