@@ -208,6 +208,74 @@ def scrape_theqoo() -> list[dict]:
     return posts
 
 
+# ── 뽐뿌 (Ppomppu) ───────────────────────────────────────────────────────────
+
+def scrape_ppomppu() -> list[dict]:
+    posts = []
+    try:
+        res = get_html("https://www.ppomppu.co.kr/zboard/zboard.php?id=freeboard")
+        res.raise_for_status()
+        soup = BeautifulSoup(res.text, "lxml")
+
+        for tr in soup.select("tr.baseList"):
+            # Title link: a.baseList-title with href containing 'no='
+            a = tr.select_one("a.baseList-title")
+            if not a:
+                continue
+
+            title_el = a.select_one("span") or a
+            title = title_el.get_text(strip=True)
+            if not title or len(title) < 3:
+                continue
+            if any(k in title for k in NOTICE_KEYWORDS):
+                continue
+
+            href = a.get("href", "")
+            if "no=" not in href:
+                continue
+            if href.startswith("http"):
+                full_url = href
+            else:
+                full_url = "https://www.ppomppu.co.kr/zboard/" + href.lstrip("/")
+
+            # Score: td.baseList-rec
+            score = 0
+            rec_td = tr.select_one("td.baseList-rec")
+            if rec_td:
+                try:
+                    score = int(rec_td.get_text(strip=True).replace(",", "").split("-")[0] or 0)
+                except (ValueError, IndexError):
+                    pass
+
+            # Views: td.baseList-hit
+            views = None
+            hit_td = tr.select_one("td.baseList-hit")
+            if hit_td:
+                try:
+                    views = int(hit_td.get_text(strip=True).replace(",", ""))
+                except ValueError:
+                    pass
+
+            post_id = re.search(r"no=(\d+)", full_url)
+            posts.append({
+                "id":         post_id.group(1) if post_id else full_url,
+                "site":       "ppomppu",
+                "title":      title,
+                "url":        full_url,
+                "thumb":      None,
+                "score":      score,
+                "views":      views,
+                "crawled_at": NOW,
+            })
+            if len(posts) >= MAX_PER_SITE:
+                break
+
+        print(f"[ppomppu] {len(posts)} posts")
+    except Exception as e:
+        print(f"[ppomppu] FAILED: {e}", file=sys.stderr)
+    return posts
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main():
@@ -216,7 +284,7 @@ def main():
 
     all_posts: list[dict] = []
 
-    for scraper in [scrape_fmkorea, scrape_ruliweb, scrape_theqoo]:
+    for scraper in [scrape_fmkorea, scrape_ruliweb, scrape_theqoo, scrape_ppomppu]:
         all_posts.extend(scraper())
         time.sleep(1)
 

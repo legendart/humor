@@ -4,6 +4,7 @@ const KO_SITE_LABELS = {
   fmkorea:  '에펨코리아',
   ruliweb:  '루리웹',
   theqoo:   '더쿠',
+  ppomppu:  '뽐뿌',
 };
 
 function koTimeAgo(isoStr) {
